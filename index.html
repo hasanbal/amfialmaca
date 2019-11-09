@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>amfi almaca</title>
+</head>
+<body>
+    <form>
+        amfi<br>
+        <input type="text" id="amfi" value="BMB-3" required><br>
+        tarih (gg.aa.yy) <br>
+        <input type="text" id="tarih" required><br>
+        baslangic saati (ss.dd)<br>
+        <input type="text" id="baslangicSaati" required><br>
+        bitis saati (ss.dd) <br>
+        <input type="text" id="bitisSaati" required><br>
+        amfiyi alma amaci <br>
+        <input type="text" id="amac" value="Haftalik Toplanti" required><br> <br>
+        <input type="submit" value="pdf olustur" onclick="createPDF()">
+    </form>
+</body>
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+
+<script type="text/javascript">
+
+var generateData = function (amount) {
+    var result = [];
+    var amfi = document.getElementById("amfi").value;
+    var baslangicSaati = document.getElementById("baslangicSaati").value;
+    var bitisSaati = document.getElementById("bitisSaati").value;
+    var tarih = document.getElementById("tarih").value;
+    var amac = document.getElementById("amac").value;
+
+
+    if(amfi == "" || baslangicSaati == "" || bitisSaati == "" || tarih == "" || amac == ""){
+        alert("bosluklarin tamamini doldurmalisin moruk");
+        return;
+    }
+
+    var row=[]
+
+    row[0] =
+    {
+        0: "Talepte Bulunan Topluluk",
+        1: "Bilgisayar Toplulugu",
+    };
+    row[1] =
+    {
+        0: "Talepte Bulunulan Amfi ",
+        1: amfi
+    };
+    row[2] = 
+    {
+      0: "Kullanim Zamani",
+      1: "Tarih: "+tarih+" Saat " + baslangicSaati + "'dan "+bitisSaati+"'a kadar."
+    };
+    row[3]={
+        0:"Amfinin Kullanim Amaci",
+        1:amac
+    };
+    row[4]={
+        0:"Amfinin Belirtilen Zaman\nAraliginda Uygunlugu\n(Bolum sekreterligi dolduracak)",
+        1:""
+    };
+
+
+
+   for (var i = 0; i < row.length; i += 1) {
+     result.push(Object.assign({}, row[i]));
+   }
+    return result;
+};
+
+function createHeaders(keys) {
+    var result = [];
+    for (var i = 0; i < keys.length; i += 1) {
+        result.push({
+        'id' : keys[i],
+            'name': keys[i],
+            'prompt': keys[i],
+            'width': 125,
+            'align': 'center',
+            'padding': 0
+        });
+    }
+    return result;
+};
+
+function createPDF(){
+
+    var headers = createHeaders(["0", "1"]);
+
+    var doc = new jsPDF({ putOnlyUsedFonts: true,  });
+
+
+    doc.setFontSize(16);
+    doc.text(65, 10, 'ODTU Bilgisayar Mühendisligi');
+    doc.setFontSize(12);
+    doc.text(60,20,"Amfi Kullanim Talebi Formu ve Taahhutnamesi");
+
+    doc.setFontSize(12);
+    doc.text(25, 30, "Asagidaki formun eksiksiz doldurulup ys@ceng.metu.edu.tr adresine PDF formatinda\ngonderilmesi gerekmektedir. ");
+
+    doc.table(10, 40, generateData(1), headers, { autoSize: false,printHeaders:false });
+
+    doc.setLineWidth(1);
+    doc.rect(10,160,170,70);
+
+    doc.setFillColor(234,234,234);
+    doc.rect(10,160,170,70, 'F');
+
+    doc.setFontType("bold");
+    doc.text(15,170,"Taahhutname:");
+
+    doc.setFontType("normal");
+    doc.text(15,175,"Yukarida belirtilen amaclarla talep edilen amfinin, topluluk faaliyetleri icin\nkullanilacagini; topluluk faaliyeleri disinda veya yasalar ve yurutmeliklerle cizilmis\ncerceveler disinda bir amac icin kullanilmayacagini; amfinin mobilya, bilgisayar,\nmakine ve techizatlarini kullanim amaclarina uygun bir sekilde kullanip, amfiyi temiz,\nduzenli birakacagimizi taahhut ediyorum ve aksi durumlarda Bilgisayar Muhendisligi\namfilerinin toplulugumuza tahsis edilmeyebilecegini, disiplin sorusturmasi basta olmak\nuzere diger adli sureclerin isletilebilecegini kabul ediyorum.");
+    doc.text(175,210,"Topluluk Adina\nHasan Bal\nODTU Ogrenci No: 2380160\nbal.hasan@metu.edu.tr, 531 834 02 60","right");
+
+    doc.setFontType("bold");
+    doc.text(15,240,"Bolum Onayi:");
+
+    doc.setFontType("normal");
+    doc.text(15,245,"Yukarida adi anilan toplulugun talep ettigi amfiyi, topluluk faaliyetleri cercevesinde\nyukarida belirtilen amac ile kullanmasi uygundur.");
+
+    doc.text(155,255,"Tarih:");
+
+
+    doc.setLineWidth(0.1);
+    doc.rect(10,258,170,30);
+
+    doc.text(15,265,"   Yukarida adi anilan toplulugun talep ettigi amfiyi, topluluk faaliyetleri cercevesinde\nyukarida belirtilen amac ile kullanmasi uygundur.\n     Tarih:                                                                              Yrd.Doc.Dr. Sinan Kalkan");
+
+
+    doc.output('dataurlnewwindow');
+
+   // doc.save('AmfiTalepFormu.pdf');
+
+}
+</script>
